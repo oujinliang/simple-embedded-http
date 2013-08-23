@@ -79,16 +79,17 @@ private class MySimpleHandler(classes: Array[Class[_]]) extends HttpHandler {
 
            // TODO: currently only static method is supported
            val method = pair.method
-           val field = method.getDeclaringClass().getField("MODULE$");
-           val instance = field.get(null);
-           val result = pair.method.invoke(instance, args)
-
+//           val field = method.getDeclaringClass().getField("MODULE$");
+//           val instance = field.get(null);
+            val result = method.invoke(null, args:_*)
            (200, if (result == null) "null" else result.toString) 
        } getOrElse (200, "Bad request")
     }
 
     private def getHttpHandlerMethods(clz: Class[_]) = {
-        (clz.getDeclaredMethods() map { m =>
+        val name = clz.getName
+        val clz1 = if(name.endsWith("$")) Class.forName(name.substring(0,name.length - 1)) else clz
+        (clz1.getDeclaredMethods() map { m =>
             val annotations = m.getAnnotations.filter(a => expectedMethods.contains(a.annotationType()))
             if (annotations.isEmpty) None else Some(m, getParams(m), annotations(0)) 
         }).flatten map { case (method, params, httpMethod) =>
