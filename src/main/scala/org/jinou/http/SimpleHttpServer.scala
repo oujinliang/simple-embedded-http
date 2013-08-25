@@ -9,6 +9,7 @@ import com.sun.net.httpserver._
 import java.io._
 import java.net.InetSocketAddress
 import java.lang.reflect.Method
+import scala.annotation.varargs
 
 /**
  *
@@ -41,7 +42,7 @@ object Converters {
     val defaultConverter = (str: String) => str
     
     val converterMap: Map[Class[_], String => AnyRef] = Map(
-        classOf[Int] -> intConverter, classOf[Integer] -> intConverter,
+        classOf[Int] -> intConverter, classOf[java.lang.Integer] -> intConverter,
         classOf[Long] -> longConverter, classOf[java.lang.Long] -> longConverter,
         classOf[Float] -> floatConverter, classOf[java.lang.Float] -> floatConverter,
         classOf[Double] -> doubleConverter, classOf[java.lang.Double] -> doubleConverter,
@@ -55,7 +56,6 @@ private class MySimpleHandler(classes: Array[Class[_]]) extends HttpHandler {
     private val expectedMethods = Array(classOf[GET], classOf[POST])
     private val httpMethodRules = classes map (getHttpHandlerMethods) flatten
 
-    
     @throws(classOf[IOException])
     override def handle(t: HttpExchange) {
         val (code, response) = 
@@ -79,9 +79,7 @@ private class MySimpleHandler(classes: Array[Class[_]]) extends HttpHandler {
 
            // TODO: currently only static method is supported
            val method = pair.method
-//           val field = method.getDeclaringClass().getField("MODULE$");
-//           val instance = field.get(null);
-            val result = method.invoke(null, args:_*)
+           val result = method.invoke(null, args:_*)
            (200, if (result == null) "null" else result.toString) 
        } getOrElse (200, "Bad request")
     }

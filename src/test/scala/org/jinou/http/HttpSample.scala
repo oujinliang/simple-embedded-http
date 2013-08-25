@@ -16,7 +16,12 @@ object HttpSample {
     }
 
     @GET("/")
-    def index() = "<html><body>Hello</body></html>"
+    def index() = 
+        <html><body>
+            <ul><li><a href='/test/id'>test id</a></li>
+                <li><a href='/test/id/user'>test id user</a></li>
+            </ul>
+        </body></html>
         
     @GET("/test/{id}")
     def testRest1(@Param("id") id: String) = {

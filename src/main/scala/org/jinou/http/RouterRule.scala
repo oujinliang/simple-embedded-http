@@ -47,7 +47,7 @@ case class RouterRule(val rule: String) {
         val tmpMap = collection.mutable.HashMap[String, String]()
         val passed = urlParts.corresponds(parts) { case (u, p) =>
            p match {
-               case StaticPart(u) => true
+               case StaticPart(name) => u == name
                case DynamicPart(name, reg) => u match {
                    case reg(value) => tmpMap += name -> value; true
                    case _ => false
